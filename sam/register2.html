@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CineMax - Sign Up</title>
+    <!-- External Font and Icon Libraries -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <style>
+      /* Global Reset and Base Styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Montserrat", sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+        background-color: white;
+      }
+
+      /* Registration Form Section with Background Image */
+      .upper-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 64px 16px;
+        background-image: url("img/register.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: relative;
+      }
+
+      /* Gradient Overlay for Background Image */
+      .upper-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          rgba(10, 10, 30, 0.8),
+          rgba(40, 20, 60, 0.8)
+        );
+        z-index: 1;
+      }
+
+      /* Form Container with Glass Effect */
+      .form-container {
+        max-width: 360px;
+        width: 100%;
+        padding: 32px 24px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        position: relative;
+        z-index: 2;
+      }
+
+      /* Form Title and Subtitle */
+      .title {
+        color: white;
+        font-size: 28px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 16px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .subtitle {
+        color: white;
+        font-size: 16px;
+        text-align: center;
+        margin-bottom: 32px;
+        opacity: 0.9;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Form Elements Styling */
+      .form-group {
+        margin-bottom: 24px;
+      }
+
+      .form-label {
+        display: block;
+        color: white;
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 8px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .form-input {
+        width: 100%;
+        height: 48px;
+        padding: 0 16px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 6px;
+        font-size: 14px;
+        background-color: rgba(255, 255, 255, 0.85);
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .form-input::placeholder {
+        color: #808080;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #ff69b4;
+        box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.3),
+          0 2px 6px rgba(0, 0, 0, 0.2);
+        background-color: rgba(255, 255, 255, 0.95);
+      }
+
+      /* Input Icon Styling */
+      .input-wrapper {
+        position: relative;
+      }
+
+      .input-wrapper i {
+        position: absolute;
+        top: 50%;
+        left: 14px;
+        transform: translateY(-50%);
+        color: #808080;
+        font-size: 16px;
+        pointer-events: none;
+      }
+
+      .input-wrapper .form-input {
+        padding-left: 40px;
+      }
+
+      /* Submit Button Styling */
+      .submit-btn {
+        width: 100%;
+        height: 48px;
+        background-color: #ff6347;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 35px;
+        box-shadow: 0 2px 8px rgba(255, 99, 71, 0.4);
+      }
+
+      .submit-btn:hover {
+        transform: scale(1.03);
+        box-shadow: 0 4px 12px rgba(255, 99, 71, 0.6);
+      }
+
+      /* Secondary Links Styling */
+      .secondary-links {
+        display: flex;
+        justify-content: center;
+        margin-top: 16px;
+      }
+
+      .secondary-link {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 12px;
+        text-decoration: none;
+        margin: 0 8px;
+        transition: all 0.3s ease;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .secondary-link:hover {
+        text-decoration: underline;
+        color: #ff69b4;
+      }
+
+      /* How It Works Section Styling */
+      .instructions-section {
+        background-color: white;
+        padding: 64px 16px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .instructions-container {
+        max-width: 800px;
+        width: 100%;
+      }
+
+      .instructions-title {
+        color: #6200ee;
+        font-size: 24px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      .instructions-description {
+        text-align: center;
+        margin-bottom: 40px;
+        color: #333;
+      }
+
+      /* Step Cards Grid Layout */
+      .step-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+      }
+
+      .step-card {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease;
+      }
+
+      .step-card:hover {
+        transform: translateY(-6px);
+      }
+
+      .step-icon {
+        font-size: 28px;
+        color: #6200ee;
+        margin-bottom: 12px;
+      }
+
+      .step-heading {
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .step-text {
+        font-size: 16px;
+        color: #333;
+        line-height: 1.5;
+      }
+
+      /* Footer Styling */
+      .footer {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 16px 0;
+        font-size: 14px;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        margin-top: 40px;
+      }
+
+      .footer strong {
+        color: #ff6347;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 480px) {
+        .form-container {
+          padding: 24px 16px;
+        }
+
+        .form-input {
+          height: 56px;
+          font-size: 16px;
+        }
+
+        .submit-btn {
+          height: 56px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Registration Form Section -->
+    <div class="upper-section">
+      <div class="form-container">
+        <h1 class="title">Sign Up</h1>
+        <p class="subtitle">Discover your next favorite movie</p>
+
+        <form id="registration-form">
+          <!-- Full Name Input -->
+          <div class="form-group">
+            <label for="fullname" class="form-label">Full name</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user"></i>
+              <input
+                id="fullname"
+                type="text"
+                name="fullname"
+                class="form-input"
+                placeholder="Adesoro Olufemisoro"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Email Input -->
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <div class="input-wrapper">
+              <i class="fas fa-envelope"></i>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                class="form-input"
+                placeholder="femi@email.com"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Password Input -->
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock"></i>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                class="form-input"
+                placeholder="at least 8 characters"
+                required
+                minlength="8"
+              />
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="submit-btn">Create account</button>
+
+          <!-- Login Link -->
+          <div class="secondary-links">
+            <a href="login.html" class="secondary-link">Already have an account? Log in</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="instructions-section">
+      <div class="instructions-container">
+        <h2 class="instructions-title">How CineMax Works</h2>
+        <p class="instructions-description">
+          Get personalized movie recommendations in 5 simple steps:
+        </p>
+
+        <!-- Steps Grid -->
+        <div class="step-grid">
+          <!-- Step 1 -->
+          <div class="step-card">
+            <i class="fas fa-user-plus step-icon"></i>
+            <h3 class="step-heading">Step 1</h3>
+            <p class="step-text">Create a free account to get started.</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="step-card">
+            <i class="fas fa-sign-in-alt step-icon"></i>
+            <h3 class="step-heading">Step 2</h3>
+            <p class="step-text">Login to your account</p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="step-card">
+            <i class="fas fa-search step-icon"></i>
+            <h3 class="step-heading">Step 3</h3>
+            <p class="step-text">
+              Search for a movie you love (e.g. Inception).
+            </p>
+          </div>
+          
+          <!-- Step 4 -->
+          <div class="step-card">
+            <i class="fas fa-magic step-icon"></i>
+            <h3 class="step-heading">Step 4</h3>
+            <p class="step-text">Get instant, AI-powered recommendations.</p>
+          </div>
+          
+          <!-- Step 5 -->
+          <div class="step-card">
+            <i class="fas fa-star step-icon"></i>
+            <h3 class="step-heading">Step 5</h3>
+            <p class="step-text">
+              Rate your favorite movies to get more accurate suggestions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+      <p>
+        &copy; 2025 CineMax. All Rights Reserved. | Designed by
+        <strong>Adesoro Olufemisoro</strong>
+      </p>
+    </footer>
+  </body>
+</html>

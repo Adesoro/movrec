@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1920" height="1080" fill="#1a1a2e"/>
+  <path d="M960 540m-200 0a200 200 0 1 0 400 0a200 200 0 1 0 -400 0" fill="#ff6347"/>
+  <text x="960" y="540" text-anchor="middle" dominant-baseline="middle" fill="white" font-family="Arial" font-size="48">No Image Available</text>
+</svg> 

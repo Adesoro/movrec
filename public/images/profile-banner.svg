@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1920" height="400" viewBox="0 0 1920 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Film strip pattern -->
+    <pattern id="filmStrip" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="40" height="40" fill="none" stroke="#ff6347" stroke-width="1" stroke-opacity="0.1"/>
+      <circle cx="20" cy="20" r="2" fill="#ff6347" fill-opacity="0.2"/>
+    </pattern>
+  </defs>
+
+  <!-- Main background -->
+  <rect width="1920" height="400" fill="url(#bgGradient)"/>
+  
+  <!-- Film strip pattern overlay -->
+  <rect width="1920" height="400" fill="url(#filmStrip)"/>
+  
+  <!-- Decorative elements -->
+  <g opacity="0.1">
+    <!-- Camera icon -->
+    <path d="M100 200c0-55.2 44.8-100 100-100h100c55.2 0 100 44.8 100 100s-44.8 100-100 100H200c-55.2 0-100-44.8-100-100zm100-50c-27.6 0-50 22.4-50 50s22.4 50 50 50 50-22.4 50-50-22.4-50-50-50z" fill="#ff6347"/>
+    
+    <!-- Film reel -->
+    <circle cx="1600" cy="200" r="60" fill="none" stroke="#ff6347" stroke-width="4"/>
+    <circle cx="1600" cy="200" r="20" fill="#ff6347"/>
+    <circle cx="1600" cy="200" r="40" fill="none" stroke="#ff6347" stroke-width="2"/>
+    
+    <!-- Clapperboard -->
+    <path d="M400 150h200v100H400z" fill="none" stroke="#ff6347" stroke-width="4"/>
+    <path d="M400 150l200 100M400 250l200-100" stroke="#ff6347" stroke-width="2"/>
+  </g>
+  
+  <!-- Subtle grid lines -->
+  <g stroke="#ffffff" stroke-opacity="0.05">
+    <line x1="0" y1="100" x2="1920" y2="100"/>
+    <line x1="0" y1="200" x2="1920" y2="200"/>
+    <line x1="0" y1="300" x2="1920" y2="300"/>
+  </g>
+</svg> 
