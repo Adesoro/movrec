@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { API_KEY, IMAGE_BASE } from '@/config/api';
 import { StarIcon } from '@heroicons/react/24/solid';
 import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 interface Movie {
   id: number;
@@ -147,6 +148,16 @@ export default function MovieDetailsClient({ id }: { id: string }) {
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-[#1a1a2e]/80 to-transparent"></div>
+        </div>
+        {/* Back to Home Button */}
+        <div className="absolute top-4 left-4 z-10">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-black/40 hover:bg-black/60 text-white rounded-lg transition-all duration-300 backdrop-blur-sm"
+          >
+            <ArrowLeftIcon className="w-5 h-5" />
+            <span className="font-medium">Back to Home</span>
+          </Link>
         </div>
         {/* Movie Info Overlay */}
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end pb-12">
