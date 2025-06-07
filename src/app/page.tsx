@@ -58,7 +58,8 @@ export default function Home() {
         setTopRatedMovies(topRatedData.results);
 
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred while fetching movies');
+        const errorMessage = err instanceof Error ? err.message : 'An error occurred while fetching movies';
+        setError(errorMessage);
         console.error('Error fetching movies:', err);
       } finally {
         setIsLoading(false);

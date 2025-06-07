@@ -7,6 +7,7 @@ import { API_KEY, IMAGE_BASE } from '@/config/api';
 import { StarIcon } from '@heroicons/react/24/solid';
 import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import PlaceholderImage from '@/components/PlaceholderImage';
 
 interface Movie {
   id: number;
@@ -53,39 +54,78 @@ export default function MovieDetailsClient({ id }: { id: string }) {
         setIsLoading(true);
         setError(null);
 
+        // First check if the API key is available
+        if (!API_KEY) {
+          throw new Error('API key is not configured');
+        }
+
+        // Fetch movie details with error handling
         const response = await fetch(
-          `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=credits,similar`
-        );
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Failed to fetch movie details');
+          `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=credits,similar,videos`
+        ).catch(err => {
+          throw new Error('Network error: Unable to connect to the movie database');
+        });
+
+        // Parse the response
+        const data = await response.json().catch(err => {
+          throw new Error('Failed to parse movie data');
+        });
+
+        // Check for API errors
+        if (!response.ok) {
+          throw new Error(data.message || `Failed to fetch movie details (Status: ${response.status})`);
+        }
+
+        // Validate required data
+        if (!data.id || !data.title) {
+          throw new Error('Invalid movie data received');
+        }
+
         setMovie(data);
 
-        // Load user rating from localStorage
-        const savedRating = localStorage.getItem(`movie_rating_${id}`);
+        // Fetch user rating if available
+        const savedRating = localStorage.getItem(`userRating-${id}`);
         if (savedRating) {
-          setUserRating(parseInt(savedRating));
+          setUserRating(Number(savedRating));
         }
 
         // Update recently viewed movies
-        const recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
-        const updatedRecentlyViewed = [
-          { id: data.id, title: data.title, poster_path: data.poster_path },
-          ...recentlyViewed.filter((m: any) => m.id !== data.id)
-        ].slice(0, 10);
-        localStorage.setItem('recentlyViewed', JSON.stringify(updatedRecentlyViewed));
+        try {
+          const recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+          const updatedRecentlyViewed = [
+            {
+              id: data.id,
+              title: data.title,
+              poster_path: data.poster_path,
+              vote_average: data.vote_average,
+              release_date: data.release_date
+            },
+            ...recentlyViewed.filter((m: any) => m.id !== data.id)
+          ].slice(0, 10);
+          localStorage.setItem('recentlyViewed', JSON.stringify(updatedRecentlyViewed));
+        } catch (err) {
+          console.error('Error updating recently viewed movies:', err);
+        }
+
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred while fetching movie details');
+        const errorMessage = err instanceof Error 
+          ? err.message 
+          : 'An unexpected error occurred while fetching movie details';
+        setError(errorMessage);
         console.error('Error fetching movie details:', err);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchMovieDetails();
+
+    if (id) {
+      fetchMovieDetails();
+    }
   }, [id]);
 
   const handleRating = (rating: number) => {
     setUserRating(rating);
-    localStorage.setItem(`movie_rating_${id}`, rating.toString());
+    localStorage.setItem(`userRating-${id}`, rating.toString());
   };
 
   if (isLoading) {
@@ -109,15 +149,15 @@ export default function MovieDetailsClient({ id }: { id: string }) {
     );
   }
 
-  if (error || !movie) {
+  if (error) {
     return (
       <div className="min-h-screen bg-[#1a1a2e] text-white flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Oops! Something went wrong</h2>
-          <p className="text-gray-400">{error || 'Movie not found'}</p>
+          <p className="text-gray-400 mb-6">{error}</p>
           <Link
             href="/"
-            className="mt-4 inline-block px-6 py-2 bg-[#ff6347] text-white rounded-lg hover:bg-[#ff6347]/90 transition-colors"
+            className="inline-block px-6 py-2 bg-[#ff6347] text-white rounded-lg hover:bg-[#ff6347]/90 transition-colors"
           >
             Back to Home
           </Link>
@@ -136,9 +176,9 @@ export default function MovieDetailsClient({ id }: { id: string }) {
   const topCast = movie.credits.cast.slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-[#1a1a2e] text-white">
-      {/* Hero Section with Backdrop */}
-      <div className="relative h-[60vh]">
+    <main className="min-h-screen pt-24">
+      {/* Hero Banner */}
+      <div className="relative h-[60vh] bg-cover bg-center" style={{ backgroundImage: `url(${IMAGE_BASE}${movie.backdrop_path})` }}>
         <div className="absolute inset-0">
           <Image
             src={`${IMAGE_BASE}${movie.backdrop_path}`}
@@ -149,26 +189,16 @@ export default function MovieDetailsClient({ id }: { id: string }) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-[#1a1a2e]/80 to-transparent"></div>
         </div>
-        {/* Back to Home Button */}
-        <div className="absolute top-4 left-4 z-10">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-black/40 hover:bg-black/60 text-white rounded-lg transition-all duration-300 backdrop-blur-sm"
-          >
-            <ArrowLeftIcon className="w-5 h-5" />
-            <span className="font-medium">Back to Home</span>
-          </Link>
-        </div>
         {/* Movie Info Overlay */}
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end pb-12">
-          <div className="flex gap-8 items-end">
-            <div className="hidden md:block w-64 flex-shrink-0">
-              <Image
-                src={`${IMAGE_BASE}${movie.poster_path}`}
+          <div className="flex flex-col md:flex-row gap-8 items-end">
+            <div className="relative w-48 h-72 flex-shrink-0">
+              <PlaceholderImage
+                src={movie.poster_path ? `${IMAGE_BASE}${movie.poster_path}` : null}
                 alt={movie.title}
-                width={256}
-                height={384}
-                className="rounded-lg shadow-xl"
+                fill
+                className="object-cover rounded-lg shadow-xl"
+                priority
               />
             </div>
             <div className="flex-1">
@@ -198,6 +228,7 @@ export default function MovieDetailsClient({ id }: { id: string }) {
           </div>
         </div>
       </div>
+
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -314,6 +345,6 @@ export default function MovieDetailsClient({ id }: { id: string }) {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 } 

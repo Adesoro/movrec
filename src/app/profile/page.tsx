@@ -20,45 +20,11 @@ export default function Profile() {
   useEffect(() => {
     const loadUserData = async () => {
       // Load rated movies
-      const ratedMoviesData: RatedMovie[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key?.startsWith('movie_rating_')) {
-          const movieId = key.replace('movie_rating_', '');
-          const rating = parseInt(localStorage.getItem(key) || '0');
-          
-          try {
-            const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}`);
-            const movieData = await response.json();
-            ratedMoviesData.push({
-              id: movieData.id,
-              title: movieData.title,
-              poster_path: movieData.poster_path,
-              vote_average: movieData.vote_average,
-              userRating: rating
-            });
-          } catch (error) {
-            console.error('Error fetching movie details:', error);
-          }
-        }
-      }
-      setRatedMovies(ratedMoviesData);
+      loadUserRatings();
 
-      // Load recently viewed movies
+      // Load recently viewed movies directly from localStorage
       const recentlyViewedData = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
-      const recentlyViewedMovies = [];
-      
-      for (const movieId of recentlyViewedData.slice(0, 20)) {
-        try {
-          const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}`);
-          const movie = await response.json();
-          recentlyViewedMovies.push(movie);
-        } catch (error) {
-          console.error('Error fetching movie details:', error);
-        }
-      }
-      
-      setRecentlyViewed(recentlyViewedMovies);
+      setRecentlyViewed(recentlyViewedData);
     };
 
     loadUserData();
@@ -67,6 +33,90 @@ export default function Profile() {
   const handleClearHistory = () => {
     localStorage.removeItem('recentlyViewed');
     setRecentlyViewed([]);
+  };
+
+  const loadUserRatings = () => {
+    try {
+      const ratings: { movieId: string; rating: string }[] = [];
+      
+      // Get all items from localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+
+        // Check if the key follows the pattern 'userRating-{movieId}'
+        if (key.startsWith('userRating-')) {
+          const movieId = key.replace('userRating-', '');
+          const rating = localStorage.getItem(key);
+          
+          // Validate rating
+          if (rating && !isNaN(Number(rating)) && Number(rating) >= 0 && Number(rating) <= 5) {
+            ratings.push({
+              movieId,
+              rating
+            });
+          } else {
+            // Remove invalid rating
+            localStorage.removeItem(key);
+          }
+        }
+      }
+
+      // Sort ratings by most recent (assuming movieId contains timestamp)
+      ratings.sort((a, b) => Number(b.movieId) - Number(a.movieId));
+
+      // Display empty state if no ratings found
+      if (ratings.length === 0) {
+        setRatedMovies([]);
+        return;
+      }
+
+      // Fetch details for each rated movie
+      const fetchMovieDetails = async () => {
+        const movieDetails = await Promise.all(
+          ratings.map(async (item) => {
+            try {
+              const response = await fetch(
+                `https://api.themoviedb.org/3/movie/${item.movieId}?api_key=${API_KEY}`
+              );
+              if (!response.ok) throw new Error('Failed to fetch movie details');
+              const movie = await response.json();
+              return {
+                ...movie,
+                userRating: Number(item.rating)
+              };
+            } catch (error) {
+              console.error(`Error fetching movie ${item.movieId}:`, error);
+              return null;
+            }
+          })
+        );
+
+        // Filter out failed fetches and update state
+        setRatedMovies(movieDetails.filter((movie): movie is RatedMovie => movie !== null));
+      };
+
+      fetchMovieDetails();
+    } catch (error) {
+      console.error('Error loading user ratings:', error);
+      setRatedMovies([]);
+    }
+  };
+
+  const clearAllRatings = () => {
+    try {
+      // Get all rating keys
+      const ratingKeys = Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i))
+        .filter((key): key is string => key?.startsWith('userRating-') ?? false);
+
+      // Remove all rating entries
+      ratingKeys.forEach(key => localStorage.removeItem(key));
+      
+      // Update state
+      setRatedMovies([]);
+    } catch (error) {
+      console.error('Error clearing ratings:', error);
+    }
   };
 
   return (
@@ -88,12 +138,45 @@ export default function Profile() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Ratings Section */}
+      <div className="max-w-5xl mx-auto px-4 py-12">
+        {/* User Statistics */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold mb-6">Your Ratings</h2>
+          <h2 className="text-2xl font-bold mb-6">Your Statistics</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-[#2a2a4a] p-6 rounded-lg">
+              <h3 className="text-xl font-bold text-white mb-2">Movies Rated</h3>
+              <p className="text-gray-400">{ratedMovies.length}</p>
+            </div>
+            <div className="bg-[#2a2a4a] p-6 rounded-lg">
+              <h3 className="text-xl font-bold text-white mb-2">Recently Viewed</h3>
+              <p className="text-gray-400">{recentlyViewed.length}</p>
+            </div>
+            <div className="bg-[#2a2a4a] p-6 rounded-lg">
+              <h3 className="text-xl font-bold text-white mb-2">Average Rating</h3>
+              <p className="text-gray-400">
+                {ratedMovies.length > 0
+                  ? (ratedMovies.reduce((acc, movie) => acc + movie.userRating, 0) / ratedMovies.length).toFixed(1)
+                  : 'N/A'}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Ratings Section */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Your Ratings</h2>
+          {ratedMovies.length > 0 && (
+            <button
+              onClick={clearAllRatings}
+              className="text-[#ff6347] hover:text-[#ff4f2f] transition-colors"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
+        <section className="mb-16 bg-[#2a2a4a] p-6 rounded-lg">
           {ratedMovies.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
               {ratedMovies.map((movie) => (
                 <div key={movie.id} className="relative group">
                   <MovieCard movie={movie} />
@@ -109,22 +192,21 @@ export default function Profile() {
         </section>
 
         {/* Recently Viewed Section */}
-        <section className="bg-[#2a2a4a] -mx-4 px-4 py-12">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Recently Viewed</h2>
-              {recentlyViewed.length > 0 && (
-                <button
-                  onClick={handleClearHistory}
-                  className="text-[#ff6347] hover:text-[#ff4f2f] transition-colors"
-                >
-                  Clear all
-                </button>
-              )}
-            </div>
-
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Recently Viewed</h2>
+          {recentlyViewed.length > 0 && (
+            <button
+              onClick={handleClearHistory}
+              className="text-[#ff6347] hover:text-[#ff4f2f] transition-colors"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
+        <section className="mb-16 bg-[#2a2a4a] p-6 rounded-lg">
+          <div className="max-w-5xl mx-auto">
             {recentlyViewed.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
                 {recentlyViewed.map((movie) => (
                   <MovieCard key={movie.id} movie={movie} />
                 ))}
