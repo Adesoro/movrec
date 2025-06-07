@@ -129,7 +129,7 @@ export default function Register() {
 
                     <div className="text-center text-sm text-white/80">
                       Already have an account?{' '}
-                      <Link href="/login" className="text-[#ff6347] hover:text-[#ff4f2f] transition-colors font-medium">
+                      <Link href="/" className="text-[#ff6347] hover:text-[#ff4f2f] transition-colors font-medium">
                         Sign in
                       </Link>
                     </div>

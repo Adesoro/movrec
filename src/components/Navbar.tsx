@@ -97,11 +97,11 @@ export default function Navbar() {
   // Handle sign out
   const handleSignOut = () => {
     // Add your sign out logic here, e.g., clearing tokens, etc.
-    router.push('/login');
+    router.push('/');
   };
 
   // Don't render Navbar on login and register pages
-  if (pathname === '/login' || pathname === '/register') {
+  if (pathname === '/' || pathname === '/login' || pathname === '/register') {
     return null;
   }
 
@@ -112,16 +112,16 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/home" className="flex items-center space-x-2">
             <span className="text-2xl font-bold text-white">CineMax</span>
           </Link>
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-12">
             <Link 
-              href="/" 
+              href="/home" 
               className={`text-sm font-medium transition-colors ${
-                pathname === '/' ? 'text-[#ff6347] border-b-2 border-[#ff6347]' : 'text-white hover:text-[#ff6347] hover:border-b-2 hover:border-[#ff6347]'
+                pathname === '/home' ? 'text-[#ff6347] border-b-2 border-[#ff6347]' : 'text-white hover:text-[#ff6347] hover:border-b-2 hover:border-[#ff6347]'
               }`}
             >
               Home
