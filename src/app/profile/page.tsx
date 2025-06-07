@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Navbar from '@/components/Navbar';
 import MovieCard from '@/components/MovieCard';
 import { API_KEY, IMAGE_BASE } from '@/config/api';
 
@@ -72,8 +71,6 @@ export default function Profile() {
 
   return (
     <main className="min-h-screen">
-      <Navbar />
-
       {/* Hero Banner */}
       <div className="relative h-[40vh] bg-cover bg-center" style={{ backgroundImage: 'url("/images/profile-bg.jpg")' }}>
         <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] to-transparent"></div>

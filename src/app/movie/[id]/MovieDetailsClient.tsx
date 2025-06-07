@@ -133,7 +133,7 @@ export default function MovieDetailsClient({ id }: { id: string }) {
   };
 
   const director = movie.credits.crew.find(person => person.job === 'Director');
-  const topCast = movie.credits.cast.slice(0, 6);
+  const topCast = movie.credits.cast.slice(0, 4);
 
   return (
     <div className="min-h-screen bg-[#1a1a2e] text-white">
