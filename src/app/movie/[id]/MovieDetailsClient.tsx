@@ -172,17 +172,17 @@ export default function MovieDetailsClient({ id }: { id: string }) {
     return `${hours}h ${mins}m`;
   };
 
-  const director = movie.credits.crew.find(person => person.job === 'Director');
-  const topCast = movie.credits.cast.slice(0, 4);
+  const director = movie?.credits?.crew?.find(person => person.job === 'Director');
+  const topCast = movie?.credits?.cast?.slice(0, 4) || [];
 
   return (
     <main className="min-h-screen pt-24">
       {/* Hero Banner */}
-      <div className="relative h-[60vh] bg-cover bg-center" style={{ backgroundImage: `url(${IMAGE_BASE}${movie.backdrop_path})` }}>
+      <div className="relative h-[60vh] bg-cover bg-center" style={{ backgroundImage: movie?.backdrop_path ? `url(${IMAGE_BASE}${movie.backdrop_path})` : 'none' }}>
         <div className="absolute inset-0">
           <Image
-            src={`${IMAGE_BASE}${movie.backdrop_path}`}
-            alt={movie.title}
+            src={movie?.backdrop_path ? `${IMAGE_BASE}${movie.backdrop_path}` : '/images/placeholder-poster.svg'}
+            alt={movie?.title || 'Movie Backdrop'}
             fill
             className="object-cover"
             priority
@@ -193,37 +193,37 @@ export default function MovieDetailsClient({ id }: { id: string }) {
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end pb-12">
           <div className="flex flex-col md:flex-row gap-8 items-end">
             <div className="relative w-48 h-72 flex-shrink-0">
-              <PlaceholderImage
-                src={movie.poster_path ? `${IMAGE_BASE}${movie.poster_path}` : null}
-                alt={movie.title}
+              <Image
+                src={movie?.poster_path ? `${IMAGE_BASE}${movie.poster_path}` : '/images/placeholder-poster.svg'}
+                alt={movie?.title || 'Movie Poster'}
                 fill
                 className="object-cover rounded-lg shadow-xl"
                 priority
               />
             </div>
             <div className="flex-1">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">{movie.title}</h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">{movie?.title || 'Unknown Title'}</h1>
               <div className="flex items-center gap-4 text-gray-300 mb-6">
-                <span>{new Date(movie.release_date).getFullYear()}</span>
+                <span>{movie?.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}</span>
                 <span>•</span>
-                <span>{formatRuntime(movie.runtime)}</span>
+                <span>{movie?.runtime ? `${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}m` : 'N/A'}</span>
                 <span>•</span>
                 <div className="flex items-center gap-1">
                   <StarIcon className="w-5 h-5 text-yellow-400" />
-                  <span>{movie.vote_average.toFixed(1)}</span>
+                  <span>{movie?.vote_average?.toFixed(1) || 'N/A'}</span>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 mb-6">
-                {movie.genres.map(genre => (
+                {movie?.genres?.map(genre => (
                   <span
                     key={genre.id}
                     className="px-3 py-1 bg-[#2a2a4a] rounded-full text-sm"
                   >
                     {genre.name}
                   </span>
-                ))}
+                )) || <span className="px-3 py-1 bg-[#2a2a4a] rounded-full text-sm">N/A</span>}
               </div>
-              <p className="text-lg text-gray-300 max-w-3xl">{movie.overview}</p>
+              <p className="text-lg text-gray-300 max-w-3xl">{movie?.overview || 'No overview available.'}</p>
             </div>
           </div>
         </div>
@@ -259,33 +259,40 @@ export default function MovieDetailsClient({ id }: { id: string }) {
               <h2 className="text-2xl font-bold mb-2">Similar Movies</h2>
               <div className="bg-[#2a2a4a] rounded-lg p-6 mb-6">
                 <p className="text-lg text-center">
-                  Based on your interest in <span className="text-[#ff6347] font-semibold">{movie.title}</span>, we think you'll enjoy these films
+                  Based on your interest in <span className="text-[#ff6347] font-semibold">{movie?.title || 'this movie'}</span>, we think you'll enjoy these films
                 </p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {movie.similar.results.slice(0, 8).map(similarMovie => (
+                {movie?.similar?.results?.slice(0, 8).map(similarMovie => (
                   <Link
                     key={similarMovie.id}
                     href={`/movie/${similarMovie.id}`}
                     className="group"
                   >
-                    <div className="relative aspect-[2/3] mb-2 rounded-lg overflow-hidden">
+                    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-800">
                       <Image
-                        src={`${IMAGE_BASE}${similarMovie.poster_path}`}
+                        src={similarMovie.poster_path ? `${IMAGE_BASE}${similarMovie.poster_path}` : '/images/placeholder-poster.svg'}
                         alt={similarMovie.title}
                         fill
                         className="object-cover transition-transform group-hover:scale-105"
+                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 15vw"
                       />
-                    </div>
-                    <h3 className="font-medium group-hover:text-[#ff6347] transition-colors">
-                      {similarMovie.title}
-                    </h3>
-                    <div className="flex items-center gap-1 text-sm text-gray-400">
-                      <StarIcon className="w-4 h-4 text-yellow-400" />
-                      <span>{similarMovie.vote_average.toFixed(1)}</span>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="absolute bottom-0 left-0 right-0 p-4">
+                          <h3 className="text-sm font-medium line-clamp-2">{similarMovie.title}</h3>
+                          <div className="flex items-center gap-1 mt-1">
+                            <span className="text-yellow-400">★</span>
+                            <span className="text-sm">{similarMovie.vote_average?.toFixed(1) || 'N/A'}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </Link>
-                ))}
+                )) || (
+                  <div className="col-span-full text-center text-gray-400 py-8">
+                    No similar movies found.
+                  </div>
+                )}
               </div>
             </section>
           </div>
@@ -323,22 +330,19 @@ export default function MovieDetailsClient({ id }: { id: string }) {
                 </div>
                 <div>
                   <h3 className="text-sm text-gray-400 mb-1">Release Date</h3>
-                  <p>{new Date(movie.release_date).toLocaleDateString('en-US', {
+                  <p>{movie?.release_date ? new Date(movie.release_date).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
-                  })}</p>
+                  }) : 'N/A'}</p>
                 </div>
                 <div>
                   <h3 className="text-sm text-gray-400 mb-1">Runtime</h3>
-                  <p>{formatRuntime(movie.runtime)}</p>
+                  <p>{movie?.runtime ? formatRuntime(movie.runtime) : 'N/A'}</p>
                 </div>
                 <div>
                   <h3 className="text-sm text-gray-400 mb-1">TMDB Rating</h3>
-                  <div className="flex items-center gap-2">
-                    <StarIcon className="w-5 h-5 text-yellow-400" />
-                    <span>{movie.vote_average.toFixed(1)}/10</span>
-                  </div>
+                  <p>{movie?.vote_average?.toFixed(1) || 'N/A'}</p>
                 </div>
               </div>
             </section>
